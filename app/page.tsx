@@ -74,16 +74,26 @@ function LangSwitcher({ lang, setLang }: { lang: Lang; setLang: (l: Lang) => voi
 }
 
 // ── KPI Card ──────────────────────────────────────────────────────────────────
-function KPICard({ icon: Icon, label, value, sub }: {
-  icon: React.ElementType; label: string; value: string; sub?: string
+function KPICard({ icon: Icon, label, value, sub, trend }: {
+  icon: React.ElementType; label: string; value: string; sub?: string; trend?: number
 }) {
+  const up = trend !== undefined && trend > 0
+  const dn = trend !== undefined && trend < 0
   return (
     <div style={{ background: SURFACE, border: `1px solid ${BORDER}` }} className="rounded-xl p-5 flex flex-col gap-3">
       <div className="flex items-center gap-2 text-zinc-400 text-xs uppercase tracking-widest">
         <Icon size={14} style={{ color: ACCENT }} />{label}
       </div>
       <div className="text-2xl font-bold text-white">{value}</div>
-      {sub && <div className="text-xs text-zinc-500">{sub}</div>}
+      {trend !== undefined ? (
+        <div className="text-xs font-medium flex items-center gap-1"
+          style={{ color: up ? '#22c55e' : dn ? '#f87171' : '#71717a' }}>
+          <span>{up ? '▲' : dn ? '▼' : '—'}</span>
+          <span>{up ? '+' : ''}{Number(trend).toFixed(1)}% MoM</span>
+        </div>
+      ) : sub ? (
+        <div className="text-xs text-zinc-500">{sub}</div>
+      ) : null}
     </div>
   )
 }
@@ -480,16 +490,21 @@ export default function Dashboard() {
       <main className="max-w-7xl mx-auto px-6 py-8">
         {loading ? <Loading /> : error ? <DBError message={error} t={t} /> : (
           <>
-            {kpis && (
-              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4 mb-8">
-                <KPICard icon={ShoppingCart} label={t.kpi_orders}    value={fmt.number(kpis.total_orders)} />
-                <KPICard icon={Users}        label={t.kpi_customers} value={fmt.number(kpis.total_customers)} />
-                <KPICard icon={DollarSign}   label={t.kpi_revenue}   value={fmt.currency(kpis.gross_revenue)} />
-                <KPICard icon={TrendingUp}   label={t.kpi_avg_order} value={fmt.currency(kpis.avg_order_value)} />
-                <KPICard icon={Star}         label={t.kpi_review}    value={fmt.score(kpis.avg_review_score)} sub={t.kpi_review_sub} />
-                <KPICard icon={Truck}        label={t.kpi_delivery}  value={fmt.pct(kpis.delivery_rate)} sub={t.kpi_delivery_sub} />
-              </div>
-            )}
+            {kpis && (() => {
+              const clean = revenue.filter(d => Number(d.total_orders) >= 100)
+              const lastMonth = clean[clean.length - 1]
+              const revTrend = lastMonth ? Number(lastMonth.growth_pct) : undefined
+              return (
+                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4 mb-8">
+                  <KPICard icon={ShoppingCart} label={t.kpi_orders}    value={fmt.number(kpis.total_orders)} trend={revTrend} />
+                  <KPICard icon={Users}        label={t.kpi_customers} value={fmt.number(kpis.total_customers)} />
+                  <KPICard icon={DollarSign}   label={t.kpi_revenue}   value={fmt.currency(kpis.gross_revenue)} trend={revTrend} />
+                  <KPICard icon={TrendingUp}   label={t.kpi_avg_order} value={fmt.currency(kpis.avg_order_value)} />
+                  <KPICard icon={Star}         label={t.kpi_review}    value={fmt.score(kpis.avg_review_score)} sub={t.kpi_review_sub} />
+                  <KPICard icon={Truck}        label={t.kpi_delivery}  value={fmt.pct(kpis.delivery_rate)} sub={t.kpi_delivery_sub} />
+                </div>
+              )
+            })()}
 
             <div className="flex gap-1 mb-6 p-1 rounded-lg w-fit"
               style={{ background: SURFACE, border: `1px solid ${BORDER}` }}>
