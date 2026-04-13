@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <!-- Dark background -->
+  <rect width="32" height="32" rx="7" fill="#0d0d14"/>
+
+  <!-- Bar chart (ascending) -->
+  <!-- Bar 1 -->
+  <rect x="4" y="22" width="5" height="6" rx="1" fill="#FF694B" opacity="0.5"/>
+  <!-- Bar 2 -->
+  <rect x="11" y="17" width="5" height="11" rx="1" fill="#FF694B" opacity="0.7"/>
+  <!-- Bar 3 -->
+  <rect x="18" y="11" width="5" height="17" rx="1" fill="#FF694B" opacity="0.9"/>
+  <!-- Bar 4 (tallest, full color) -->
+  <rect x="25" y="5" width="3" height="23" rx="1" fill="#FF694B"/>
+
+  <!-- Trend line over bars -->
+  <polyline points="6,21 13,16 20,10 27,4"
+    stroke="#FF694B" stroke-width="1.5" fill="none"
+    stroke-linecap="round" stroke-linejoin="round"/>
+
+  <!-- Dot at top -->
+  <circle cx="27" cy="4" r="2" fill="#FF694B"/>
+
+  <!-- Bottom baseline -->
+  <line x1="3" y1="29" x2="29" y2="29" stroke="#26262e" stroke-width="1.2"/>
+</svg>
